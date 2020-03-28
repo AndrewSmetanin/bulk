@@ -1,0 +1,18 @@
+dist: xenial
+language: cpp
+compiler: clang
+os: linux
+addons:
+  apt:
+    packages:
+    - libboost-test-dev
+script:
+- cmake .
+- cmake --build .
+- cmake --build . --target test
+- cmake --build . --target package
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+  - curl -f -T bulk-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -uandrewsmetanin:$BINTRAY_API_KEY "https://api.bintray.com/content/andrewsmetanin/otus-cpp/bulk/0.0.$TRAVIS_BUILD_NUMBER/bulk-0.0.$TRAVIS_BUILD_NUMBER.deb;deb_distribution=xenial;deb_component=main;deb_architecture=amd64;publish=1"
