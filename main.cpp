@@ -4,6 +4,9 @@
 #include <list>
 #include <fstream>
 #include <ctime>
+#include <chrono>
+#include <thread>
+
 
 class Command 
 {
@@ -100,7 +103,7 @@ public:
         {
             text+=command->commandName + " ";
         }
-        std::cout << "---console output--- " << text <<std::endl;
+        std::cout << "bulk: " << text <<std::endl;
     }
 };
  
@@ -114,6 +117,7 @@ public:
  
     void update(std::list<Command *>& commands) override
     {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         std::string text = "";
         std::string fileName = "bulk"+std::to_string(std::time(nullptr));
         std::ofstream outfile ("./" + fileName + ".txt",std::ofstream::binary);
