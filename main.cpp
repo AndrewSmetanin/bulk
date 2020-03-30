@@ -6,24 +6,27 @@
 #include <ctime>
 #include <chrono>
 #include <thread>
-
-
-class Command 
+ 
+ 
+class Command
 {
 public:
     Command(std::string commandName):
         commandName(commandName)
     {
+        time = std::time(nullptr);
+        // std::cout << std::to_string(time) <<std::endl;
     }
     std::string commandName;
+    int time;
 };
-
+ 
 class Observer
 {
 public:
     virtual void update(std::list<Command *>& commands) = 0;
 };
-
+ 
 class Printer
 {
     int n;  //Размер блока. Задается в конструкторе
@@ -38,7 +41,7 @@ public:
     {
         subs.push_back(obs);
     }
-
+ 
     void printAll(std::list<Command *>& commands)
     {
         for(auto &s: subs)
@@ -48,7 +51,7 @@ public:
         historySize = 0;
         buffer.clear();
     }
-
+ 
     void print(std::string cmd)
     {
         if (cmd[0] == '{')
@@ -58,7 +61,7 @@ public:
                 printAll(buffer);
             }
             ++nCounter;
-        } 
+        }
         else if (cmd[0] == '}')
         {
             --nCounter;
@@ -66,8 +69,8 @@ public:
             {
                 printAll(buffer);
             }
-            
-        } 
+           
+        }
         else if (!std::cin.eof())
         {
             buffer.push_back(new Command(cmd));
@@ -79,7 +82,7 @@ public:
                     printAll(buffer);
                 }
             }
-        } 
+        }
         else if (historySize && !nCounter)
         {
             //std::cout <<"historySize = " << historySize <<std::endl;
@@ -117,9 +120,9 @@ public:
  
     void update(std::list<Command *>& commands) override
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        //std::this_thread::sleep_for(std::chrono::seconds(1));
         std::string text = "";
-        std::string fileName = "bulk"+std::to_string(std::time(nullptr));
+        std::string fileName = "bulk" + std::to_string(commands.front()->time);
         std::ofstream outfile ("./" + fileName + ".txt",std::ofstream::binary);
         for (auto command : commands)
         {
@@ -127,29 +130,29 @@ public:
         }
         outfile.write(text.c_str(),text.size());
         outfile.close();
-
+ 
         std::cout << fileName + ".txt created\n" << std::endl;
     }
 };
-
+ 
 int main(int argc, char** argv)
 {
-    
+   
     int n; //Размер блока команд
-    
+   
     //std::cout << "Введите размер блока: ";
     //std::cin >> n;
     n = std::stoi(argv[1]);
-
+ 
     //std::cout<<"The argument is"<<argv[1]<<std::endl;
-
+ 
     std::string str;
     //std::getline(std::cin, str); //После std::cin первый getline не срабатывает
-
+ 
     Printer printer{n}; //Класс вывода на экран
     Console console{printer}; //Подписать консольно на вывод
     File file{printer}; //Подписать файл на вывод
-
+ 
     while (!std::cin.eof()) //Cntr + D -конец файла
     {
         std::getline(std::cin, str);
